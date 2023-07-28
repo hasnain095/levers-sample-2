@@ -1,0 +1,61 @@
+version: "3.3"
+services:
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    env_file:
+      - ./app1/.env_app1
+    ports:
+      - 15673:15672
+      - 5673:5672
+    environment:
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_DEFAULT_VHOST}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    networks:
+      - levers
+
+  fastapi-app-1:
+    restart: always
+    depends_on:
+      - rabbitmq
+    env_file:
+      - ./app1/.env_app1
+    ports:
+      - "8888:8888"
+    build:
+      context: ./
+      dockerfile: ./app1/app1.dockerfile
+    working_dir: /levers
+    volumes:
+      - ./app1/:/levers/
+    command: /start-reload.sh
+    networks:
+      - levers
+
+  fastapi-app-2:
+    restart: always
+    depends_on:
+      - rabbitmq
+    env_file:
+      - ./app2/.env_app2
+    ports:
+      - "8889:8889"
+    build:
+      context: ./
+      dockerfile: ./app2/app2.dockerfile
+    working_dir: /levers
+    volumes:
+      - ./app2/:/levers/
+    command: /start-reload.sh
+    networks:
+      - levers
+
+networks:
+  levers:
+    driver: bridge
+
+
+volumes:
+  app-db-data:
+
+
