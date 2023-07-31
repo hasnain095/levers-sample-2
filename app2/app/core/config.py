@@ -12,6 +12,8 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str = "app2"
 
+    RABBITMQURL:str="amqp://guest:guest@rabbitmq:5672"
+
     class Config:
         case_sensitive = True
 

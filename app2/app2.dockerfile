@@ -4,13 +4,14 @@ RUN mkdir /levers
 
 WORKDIR /levers
 
-COPY ./app1/requirements.txt .
+COPY ./app2/requirements.txt .
 
 RUN pip install -r requirements.txt
 
 COPY ./start-reload.sh /start-reload.sh
 RUN chmod +x /start-reload.sh
 
-#COPY ./app1/app /levers
+COPY ./worker-start.sh /worker-start.sh
+RUN chmod +x /worker-start.sh
 
 ENV PYTHONPATH=/levers

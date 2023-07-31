@@ -5,19 +5,25 @@ services:
     env_file:
       - ./app1/.env_app1
     ports:
-      - 15673:15672
-      - 5673:5672
+      - 15672:15672
+      - 5672:5672
     environment:
       RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_DEFAULT_VHOST}
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    healthcheck:
+      test: "rabbitmq-diagnostics -q ping"
+      interval: 5s
+      timeout: 3s
+      retries: 3
     networks:
       - levers
 
   fastapi-app-1:
     restart: always
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     env_file:
       - ./app1/.env_app1
     ports:
@@ -33,9 +39,11 @@ services:
       - levers
 
   fastapi-app-2:
+    image: fastapi-app-2
     restart: always
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     env_file:
       - ./app2/.env_app2
     ports:
@@ -47,6 +55,21 @@ services:
     volumes:
       - ./app2/:/levers/
     command: /start-reload.sh
+    networks:
+      - levers
+
+  celery-worker:
+    restart: always
+    image: fastapi-app-2
+    hostname: celery-worker
+    volumes:
+      - ./app2/:/levers/
+    env_file:
+      - ./app2/.env_app2
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    command: /worker-start.sh
     networks:
       - levers
 
