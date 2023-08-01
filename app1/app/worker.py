@@ -1,12 +1,13 @@
-import logging
+from app.core.celery_app import celery_app
 
-from .main import celery_app
-from app.core.config import settings
+from celery.utils.log import get_task_logger
 
-logger = logging.getLogger(__name__)
+logger = get_task_logger(__name__)
 
 
 @celery_app.task()
-def notify(word: str) -> str:
-	logger.error(word)
-	return f"test task return {word}"
+def sync_notification() -> None:
+    logger.info("Called sync_notification")
+    result = "OK"
+    result = celery_app.send_task("app.worker.notify_sync")
+    return result

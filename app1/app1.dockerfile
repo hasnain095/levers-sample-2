@@ -11,6 +11,7 @@ RUN pip install -r requirements.txt
 COPY ./start-reload.sh /start-reload.sh
 RUN chmod +x /start-reload.sh
 
-#COPY ./app1/app /levers
+COPY ./worker-start-1.sh /worker-start-1.sh
+RUN chmod +x /worker-start-1.sh
 
 ENV PYTHONPATH=/levers

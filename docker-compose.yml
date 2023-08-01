@@ -20,6 +20,7 @@ services:
       - levers
 
   fastapi-app-1:
+    image: fastapi-app-1
     restart: always
     depends_on:
       rabbitmq:
@@ -58,10 +59,25 @@ services:
     networks:
       - levers
 
-  celery-worker:
+  celery-worker-app-1:
+    restart: always
+    image: fastapi-app-1
+    hostname: celery-worker-1
+    volumes:
+      - ./app1/:/levers/
+    env_file:
+      - ./app1/.env_app1
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    command: /worker-start-1.sh
+    networks:
+      - levers
+
+  celery-worker-app-2:
     restart: always
     image: fastapi-app-2
-    hostname: celery-worker
+    hostname: celery-worker-2
     volumes:
       - ./app2/:/levers/
     env_file:
@@ -69,7 +85,7 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-    command: /worker-start.sh
+    command: /worker-start-2.sh
     networks:
       - levers
 

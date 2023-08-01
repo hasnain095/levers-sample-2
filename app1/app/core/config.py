@@ -1,7 +1,6 @@
+import os
 import secrets
-from typing import Any, Dict, List, Optional, Union
 
-from pydantic import AnyHttpUrl, EmailStr, HttpUrl, PostgresDsn, validator
 from pydantic_settings import BaseSettings
 
 
@@ -11,11 +10,11 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str = "app1"
 
-    RABBITMQURL:str="amqp://guest:guest@rabbitmq:5672"
+    RABBITMQURL: str = os.getenv(
+        "RABBITMQURL", "amqp://guest:guest@rabbitmq:5672")
 
     class Config:
         case_sensitive = True
 
 
-# settings = Settings()
-settings = Settings(_env_file='.env', _env_file_encoding='utf-8')
+settings = Settings()
